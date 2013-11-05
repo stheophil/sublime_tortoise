@@ -15,7 +15,7 @@ class NotFoundError(Exception):
 
 
 file_status_cache = {}
-
+plugin_dir = os.path.dirname(os.path.realpath(__file__))
 
 class TortoiseCommand():
     def get_path(self, paths):
@@ -60,7 +60,7 @@ def handles_not_found(fn):
     def handler(self, *args, **kwargs):
         try:
             fn(self, *args, **kwargs)
-        except (NotFoundError) as (exception):
+        except NotFoundError as exception:
             sublime.error_message('Tortoise: ' + str(exception))
     return handler
 
@@ -337,7 +337,7 @@ class Tortoise():
         if path in file_status_cache and file_status_cache[path]['time'] > \
                 time.time() - settings.get('cache_length'):
             if settings.get('debug'):
-                print 'Fetching cached status for %s' % path
+                print('Fetching cached status for %s' % path)
             return file_status_cache[path]['status']
 
         if settings.get('debug'):
@@ -345,7 +345,7 @@ class Tortoise():
 
         try:
             status = vcs.check_status(path)
-        except (Exception) as (exception):
+        except Exception as exception:
             sublime.error_message(str(exception))
 
         file_status_cache[path] = {
@@ -354,8 +354,8 @@ class Tortoise():
         }
 
         if settings.get('debug'):
-            print 'Fetching status for %s in %s seconds' % (path,
-                str(time.time() - start_time))
+            print('Fetching status for %s in %s seconds' % (path,
+                str(time.time() - start_time)))
 
         return status
 
@@ -525,7 +525,7 @@ class NonInteractiveProcess():
             stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
             startupinfo=startupinfo, cwd=self.cwd)
 
-        return proc.stdout.read().replace('\r\n', '\n').rstrip(' \n\r')
+        return str(proc.stdout.read()).replace('\r\n', '\n').rstrip(' \n\r')
 
 
 class SVN():
@@ -533,11 +533,14 @@ class SVN():
         self.root_dir = root_dir
 
     def check_status(self, path):
-        svn_path = os.path.join(sublime.packages_path(), __name__, 'svn',
-            'svn.exe')
+        settings = sublime.load_settings('Tortoise.sublime-settings')
+        svn_path = settings.get('svn_path', os.path.join(plugin_dir, 'svn', 'svn.exe'))
+
         proc = NonInteractiveProcess([svn_path, 'status', path],
             cwd=self.root_dir)
+
         result = proc.run().split('\n')
+
         for line in result:
             if len(line) < 1:
                 continue

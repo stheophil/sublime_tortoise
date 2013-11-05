@@ -1,6 +1,9 @@
 {
 	// The path to the TortoiseSVN TortoiseProc.exe executable
-	//"svn_tortoiseproc_path": "C:\\Program Files\\TortoiseSVN\\bin\\TortoiseProc.exe",
+	// "svn_tortoiseproc_path": "C:\\Program Files\\TortoiseSVN\\bin\\TortoiseProc.exe",
+
+	// The path to the svn.exe executable. By default, svn.exe provided with sublime_tortoise is used.
+	// "svn_path": "",
 
 	// The path to the TortoiseGit TortoiseProc.exe executable
 	//"git_tortoiseproc_path": "C:\\Program Files\\TortoiseGit\\bin\\TortoiseProc.exe",
